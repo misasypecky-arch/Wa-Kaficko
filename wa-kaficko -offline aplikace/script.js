@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initApp() {
     try {
-        // Přidali jsme r.ok pro kontrolu, jestli server nevrátil chybu (např. 404)
+       
         const [usersRes, typesRes] = await Promise.all([
             fetch(`${API_URL}?cmd=getPeopleList`)
                 .then(r => r.ok ? r.json() : null)
@@ -24,7 +24,7 @@ async function initApp() {
                 .catch(() => null)
         ]);
 
-        // STRIKTNÍ KONTROLA: Použij z API jen tehdy, pokud je to opravdu pole (seznam)
+        
         state.users = (Array.isArray(usersRes) && usersRes.length > 0) ? usersRes : [
             { id: "1", name: "Masopust Lukáš" },
             { id: "2", name: "Molič Jan" },
@@ -187,7 +187,7 @@ async function syncOfflineData() {
             });
             if (!response.ok) throw new Error("Chyba API při syncu");
         } catch (err) {
-            // Pokud se odeslání stále nedaří, necháme záznam ve frontě
+           
             remainingQueue.push(payload); 
         }
     }
@@ -203,7 +203,7 @@ function updateDailySummary(drinks) {
     const today = new Date().toLocaleDateString('cs-CZ');
     let summary = JSON.parse(localStorage.getItem('dailySummary')) || { date: today, drinks: {} };
 
-    // Pokud je nový den, resetujeme stará data
+    
     if (summary.date !== today) {
         summary = { date: today, drinks: {} };
     }
