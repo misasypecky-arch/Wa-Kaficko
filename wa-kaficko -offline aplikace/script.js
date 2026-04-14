@@ -116,6 +116,12 @@ async function saveData() {
     };
 
    
+    const totalDrinks = payload.drinks.reduce((sum, d) => sum + d.value, 0);
+    if (totalDrinks === 0) {
+        showToast("Nemáte vybraný žádný nápoj!");
+        return;
+    }
+
     updateDailySummary(payload.drinks);
 
     saveBtn.disabled = true;
@@ -130,18 +136,19 @@ async function saveData() {
         return;
     }
 
+
     try {
         const response = await fetch(`${API_URL}?cmd=saveDrinks`, {
             method: 'POST',
             body: JSON.stringify(payload)
         });
 
-        if (!response.ok) throw new Error("Server neodpověděl 200 OK");
+        if (!response.ok) throw new Error("Server vrátil chybu.");
         
-        showToast("Záznam byl uložen!");
+        showToast("Záznam byl úspěšně odeslán na server!");
         resetCounts();
     } catch (err) {
-        
+       
         saveToOfflineQueue(payload);
         resetCounts();
     } finally {
@@ -174,9 +181,9 @@ function saveToOfflineQueue(payload) {
 
 async function syncOfflineData() {
     let queue = JSON.parse(localStorage.getItem('coffeeQueue')) || [];
-    if (queue.length === 0) return;
+    if (queue.length === 0) return; 
 
-    showToast("Jste online, synchronizuji záznamy...");
+    alert(`🌐 Obnoveno připojení! Odesílám ${queue.length} uložených záznamů z lokální fronty...`);
     let remainingQueue = [];
 
     for (let payload of queue) {
@@ -187,16 +194,23 @@ async function syncOfflineData() {
             });
             if (!response.ok) throw new Error("Chyba API při syncu");
         } catch (err) {
-           
             remainingQueue.push(payload); 
         }
     }
 
     localStorage.setItem('coffeeQueue', JSON.stringify(remainingQueue));
     if (remainingQueue.length === 0) {
-        showToast("Všechna offline data odeslána!");
+        showToast("Všechna lokální data byla úspěšně synchronizována!");
+    } else {
+        alert("Některá data se stále nepodařilo odeslat. Zkusíme to znovu později.");
     }
 }
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    syncOfflineData(); 
+});
+
 window.addEventListener('online', syncOfflineData);
 
 function updateDailySummary(drinks) {
