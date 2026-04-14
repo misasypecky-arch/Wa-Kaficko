@@ -168,8 +168,8 @@ function showToast(msg) {
 function saveToOfflineQueue(payload) {
     let queue = JSON.parse(localStorage.getItem('coffeeQueue')) || [];
     queue.push(payload);
-    localStorage.setItem('coffeeQueue', JSON.stringify(queue));
-    showToast("Jste offline. Uloženo do fronty na později!");
+    localStorage.setItem('coffeeQueue', JSON.stringify(queue));    
+    alert("API není dostupné nebo jste offline. 💾 Záznam byl uložen LOKÁLNĚ do prohlížeče a odešle se automaticky po připojení.");
 }
 
 async function syncOfflineData() {
